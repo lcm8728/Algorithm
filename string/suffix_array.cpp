@@ -1,80 +1,67 @@
 #include <iostream>
 #include <algorithm>
-#include <string>
 #include <string.h>
+#include <vector>
 
 #define MAX 500000
 
 using namespace std;
 
-char str[MAX];
-int sfx[MAX];
-int g[MAX + 1];
-int ng[MAX + 1];
-int cnt[257];
-int order[257];
-int n, t;
+vector<int> getsfxarr(const char* str) {
+	int n = strlen(str);
+	int lim = max(n + 1, 257); // 257 for ascii
+	vector<int> sfx(n, 0);
+	vector<int> grp(n + 1, 0);
+	vector<int> tmp_grp(n + 1, 0);
+	vector<int> order(n, 0);
+	vector<int> cnt;
+	
 
-// compare by group
-bool cmp(int &a, int &b) {
-	if (g[a] == g[b]) {
-		return g[a + t] < g[b + t];
-	}
-	else {
-		return g[a] < g[b];
-	}
-}
-
-void getSFX() {
-	// initialize
 	for (int i = 0; i < n; ++i) {
 		sfx[i] = i;
-		g[i] = str[i];
+		// group by first character of suffix
+		grp[i] = str[i] - 'a' + 1;
 	}
 
-	for (t = 1; t < n; t <<= 1) {
-		// counting sort
-		memset(cnt, 0, sizeof(cnt));
-		for (int i = 0; i < n; ++i) cnt[g[min(i + t, n)] + 1]++;
-		for (int i = 1; i < 257; ++i) cnt[i] += cnt[i - 1];
-		for (int i = 0; i < n; ++i) order[cnt[g[min(i + t, n)]]++] = i;
+	for (int t = 1; t < n; t <<= 1) {
+		// count sort
+		cnt.clear();
+		cnt.resize(lim, 0);
+		for (int i = 0; i < n; ++i) cnt[grp[min(i + t, n)] + 1]++;
+		for (int i = 1; i < lim; ++i) cnt[i] += cnt[i - 1];
+		for (int i = 0; i < n; ++i) order[cnt[grp[min(i + t, n)]]++] = i;
 
-		memset(cnt, 0, sizeof(cnt));
-		for (int i = 0; i < n; ++i) cnt[g[i] + 1]++;
-		for (int i = 1; i < 257; ++i) cnt[i] += cnt[i - 1];
-		for (int i = 0; i < n; ++i) sfx[cnt[g[order[i]]]++] = order[i];
-		
+		cnt.clear();
+		cnt.resize(lim, 0);
+		for (int i = 0; i < n; ++i) cnt[grp[i] + 1]++;
+		for (int i = 1; i < lim; ++i) cnt[i] += cnt[i - 1];
+		for (int i = 0; i < n; ++i)	sfx[cnt[grp[order[i]]]++] = order[i];
 
-		// assign new group
-		ng[sfx[0]] = 1;
-		ng[n] = 0;
+
+		// make new group
+		tmp_grp[sfx[0]] = 1;
 		for (int i = 1; i < n; ++i) {
-			if (cmp(sfx[i - 1], sfx[i]))
-				ng[sfx[i]] = ng[sfx[i - 1]] + 1;
+			if (grp[sfx[i - 1]] < grp[sfx[i]] || (grp[sfx[i - 1]] == grp[sfx[i]] &&
+				grp[sfx[i - 1] + t] < grp[sfx[i] + t]))
+				tmp_grp[sfx[i]] = tmp_grp[sfx[i - 1]] + 1;
 			else
-				ng[sfx[i]] = ng[sfx[i - 1]];
+				tmp_grp[sfx[i]] = tmp_grp[sfx[i - 1]];
 		}
 
-
-		// copy assigned group
-		for (int i = 0; i < n; ++i)
-			g[i] = ng[i];
+		grp = tmp_grp;
 	}
+
+	return sfx;
 }
 
 int main() {
-	cin.tie(NULL);
-	ios_base::sync_with_stdio(false);
-
+	char str[MAX];
 	cin >> str;
-	n = strlen(str);
 
-	getSFX();
-	for (int i = 0; i < n; ++i) {
-		cout << sfx[i] + 1 << " ";
-	}
+	vector<int> sfx = getsfxarr(str);
+	cout << "Suffix group of \'" << str << "\' :\n";
+	for (auto it : sfx) cout << it << " ";
 	cout << "\n";
-
 
 	return 0;
 }
