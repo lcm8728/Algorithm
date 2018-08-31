@@ -1,13 +1,11 @@
-Implementation of various sorting algorithms using C++
+Implementation of sorting algorithms
 ===========
-1. make array with random key
-2. Sort using:
+1. generate random key
+2. sort using:
 	- Insertion Sort
 	- Selection Sort
 	- Bubble Sort
 	- Quick Sort
 	- Merge Sort
 	- Heap Sort
-	- Radix Sort
-3. Check Time taken
-4. Done
+3. check time
