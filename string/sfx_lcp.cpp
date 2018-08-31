@@ -9,7 +9,7 @@ using namespace std;
 
 vector<int> getsfxarr(const char* str) {
 	int n = strlen(str);
-	int lim = max(n + 1, 257); // 257 for ascii
+	int lim = max(n + 1, 257);
 	vector<int> sfx(n, 0);
 	vector<int> grp(n + 1, 0);
 	vector<int> tmp_grp(n + 1, 0);
@@ -35,14 +35,14 @@ vector<int> getsfxarr(const char* str) {
 		cnt.resize(lim, 0);
 		for (int i = 0; i < n; ++i) cnt[grp[i] + 1]++;
 		for (int i = 1; i < lim; ++i) cnt[i] += cnt[i - 1];
-		for (int i = 0; i < n; ++i)	sfx[cnt[grp[order[i]]]++] = order[i];
+		for (int i = 0; i < n; ++i) sfx[cnt[grp[order[i]]]++] = order[i];
 
 
 		// make new group
 		tmp_grp[sfx[0]] = 1;
 		for (int i = 1; i < n; ++i) {
-			if (grp[sfx[i - 1]] < grp[sfx[i]] || (grp[sfx[i - 1]] == grp[sfx[i]] &&
-				grp[sfx[i - 1] + t] < grp[sfx[i] + t]))
+			if (grp[sfx[i - 1]] < grp[sfx[i]] ||
+			   (grp[sfx[i - 1]] == grp[sfx[i]] && grp[sfx[i - 1] + t] < grp[sfx[i] + t]))
 				tmp_grp[sfx[i]] = tmp_grp[sfx[i - 1]] + 1;
 			else
 				tmp_grp[sfx[i]] = tmp_grp[sfx[i - 1]];
